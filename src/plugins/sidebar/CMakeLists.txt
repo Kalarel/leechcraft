@@ -15,6 +15,7 @@ IF (NOT QT_USE_FILE)
 	FIND_PACKAGE (LeechCraft REQUIRED)
 ENDIF (NOT QT_USE_FILE)
 
+SET (QT_USE_QTDECLARATIVE TRUE)
 INCLUDE (${QT_USE_FILE})
 INCLUDE_DIRECTORIES (
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -28,6 +29,9 @@ SET (SRCS
 	qlactionmanager.cpp
 	openedtabmanager.cpp
 	showconfigdialog.cpp
+	sidebarview.cpp
+	modelactionwrapper.cpp
+	actioniconprovider.cpp
 	)
 SET (HEADERS
 	sidebar.h
@@ -36,21 +40,29 @@ SET (HEADERS
 	qlactionmanager.h
 	openedtabmanager.h
 	showconfigdialog.h
+	sidebarview.h
+	modelactionwrapper.h
+	actioniconprovider.h
 	)
 SET (FORMS
 	sbwidget.ui
 	showconfigdialog.ui
 	)
+SET (RESOURCES
+	sidebarresources.qrc
+	)
 IF (NOT LC_NO_MOC)
 	QT4_WRAP_CPP (MOC_SRCS ${HEADERS})
 ENDIF (NOT LC_NO_MOC)
 QT4_WRAP_UI (UIS_H ${FORMS})
+QT4_ADD_RESOURCES (RCCS ${RESOURCES})
 
 ADD_LIBRARY (leechcraft_sidebar SHARED
 	${COMPILED_TRANSLATIONS}
 	${SRCS}
 	${UIS_H}
 	${MOC_SRCS}
+	${RCCS}
 	)
 TARGET_LINK_LIBRARIES (leechcraft_sidebar
 	${QT_LIBRARIES}

@@ -19,52 +19,35 @@
 #pragma once
 
 #include <QObject>
-#include <QIcon>
-#include <interfaces/iinfo.h>
-#include <interfaces/iplugin2.h>
-#include <interfaces/iactionsexporter.h>
-#include <interfaces/core/ihookproxy.h>
+#include <QHash>
 
-class QDockWidget;
+class QStandardItemModel;
+class QStandardItem;
+class QAction;
 
 namespace LeechCraft
 {
 namespace Sidebar
 {
-	class SBWidget;
-	class NewTabActionManager;
-	class QLActionManager;
-	class OpenedTabManager;
-	class SidebarView;
+	class ActionIconProvider;
 
-	class Plugin : public QObject
-				 , public IInfo
-				 , public IPlugin2
+	class ModelActionWrapper : public QObject
 	{
 		Q_OBJECT
-		Q_INTERFACES (IInfo IPlugin2)
 
-		ICoreProxy_ptr Proxy_;
+		QStandardItemModel *Wrapped_;
+		QHash<QAction*, QStandardItem*> ActionItems_;
 
-		SBWidget *Bar_;
-		NewTabActionManager *NewTabMgr_;
-		QLActionManager *QLMgr_;
-		OpenedTabManager *OTMgr_;
-
-		SidebarView *View_;
+		ActionIconProvider *IconProvider_;
 	public:
-		void Init (ICoreProxy_ptr);
-		void SecondInit ();
-		QByteArray GetUniqueID () const;
-		void Release ();
-		QString GetName () const;
-		QString GetInfo () const;
-		QIcon GetIcon () const;
-
-		QSet<QByteArray> GetPluginClasses () const;
+		ModelActionWrapper (QStandardItemModel*, ActionIconProvider*);
+	private:
+		void SetActionData (QAction*);
 	public slots:
-		void hookDockWidgetActionVisToggled (LeechCraft::IHookProxy_ptr, QDockWidget*, bool);
-		void hookGonnaFillQuickLaunch (LeechCraft::IHookProxy_ptr);
+		void addAction (QAction*);
+		void removeAction (QAction*);
+	private slots:
+		void handleActionChanged ();
 	};
 }
 }

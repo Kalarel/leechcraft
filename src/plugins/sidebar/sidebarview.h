@@ -18,53 +18,42 @@
 
 #pragma once
 
-#include <QObject>
-#include <QIcon>
-#include <interfaces/iinfo.h>
-#include <interfaces/iplugin2.h>
-#include <interfaces/iactionsexporter.h>
-#include <interfaces/core/ihookproxy.h>
+#include <QDeclarativeView>
+#include <QMap>
 
-class QDockWidget;
+class QStandardItemModel;
 
 namespace LeechCraft
 {
 namespace Sidebar
 {
-	class SBWidget;
-	class NewTabActionManager;
-	class QLActionManager;
-	class OpenedTabManager;
-	class SidebarView;
+	class ModelActionWrapper;
 
-	class Plugin : public QObject
-				 , public IInfo
-				 , public IPlugin2
+	enum ViewRoles
+	{
+		ActionIconID = Qt::UserRole + 1
+	};
+
+	class SidebarView : public QDeclarativeView
 	{
 		Q_OBJECT
-		Q_INTERFACES (IInfo IPlugin2)
 
-		ICoreProxy_ptr Proxy_;
-
-		SBWidget *Bar_;
-		NewTabActionManager *NewTabMgr_;
-		QLActionManager *QLMgr_;
-		OpenedTabManager *OTMgr_;
-
-		SidebarView *View_;
+		const QSize IconSize_;
 	public:
-		void Init (ICoreProxy_ptr);
-		void SecondInit ();
-		QByteArray GetUniqueID () const;
-		void Release ();
-		QString GetName () const;
-		QString GetInfo () const;
-		QIcon GetIcon () const;
+		enum class AreaType
+		{
+			TabOpen,
+			QuickLaunch,
+			CurrentTab
+		};
+	private:
+		QMap<AreaType, QStandardItemModel*> Models_;
+		QMap<AreaType, ModelActionWrapper*> Wrappers_;
+	public:
+		SidebarView (QWidget* = 0);
 
-		QSet<QByteArray> GetPluginClasses () const;
-	public slots:
-		void hookDockWidgetActionVisToggled (LeechCraft::IHookProxy_ptr, QDockWidget*, bool);
-		void hookGonnaFillQuickLaunch (LeechCraft::IHookProxy_ptr);
+		QStandardItemModel* GetAreaModel (AreaType) const;
+		ModelActionWrapper* GetWrapper (AreaType) const;
 	};
 }
 }

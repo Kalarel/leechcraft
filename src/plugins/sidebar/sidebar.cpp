@@ -31,6 +31,8 @@
 #include "newtabactionmanager.h"
 #include "qlactionmanager.h"
 #include "openedtabmanager.h"
+#include "sidebarview.h"
+#include "modelactionwrapper.h"
 
 namespace LeechCraft
 {
@@ -39,6 +41,9 @@ namespace Sidebar
 	void Plugin::Init (ICoreProxy_ptr proxy)
 	{
 		Proxy_ = proxy;
+
+		View_ = new SidebarView;
+		Proxy_->GetMWProxy ()->AddSideWidget (View_);
 
 		Bar_ = new SBWidget (proxy);
 		NewTabMgr_ = new NewTabActionManager (Bar_, this);
@@ -81,6 +86,9 @@ namespace Sidebar
 			const auto& acts = exp->GetActions (ActionsEmbedPlace::LCTray);
 			if (!acts.isEmpty ())
 				QLMgr_->AddToLCTray (acts);
+
+			for (const auto& act : acts)
+				View_->GetWrapper (SidebarView::AreaType::QuickLaunch)->addAction (act);
 		}
 	}
 
